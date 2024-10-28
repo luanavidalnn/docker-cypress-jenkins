@@ -1,18 +1,64 @@
 services:
   jenkins:
-    build: .
-    container_name: jenkins
-    user: root
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    container_name: jenkins-server
     ports:
       - "8080:8080"
       - "50000:50000"
     volumes:
-      - jenkins_jenkins_home:/var/jenkins_home
+      - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
       - ./ssh_config:/var/jenkins_home/.ssh
     restart: unless-stopped
-    
+    networks:
+      - jenkins-network
+
+  jenkins-agent-1:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: jenkins-agent-1
+    environment:
+      JENKINS_URL: http://jenkins:8080
+      JENKINS_AGENT_NAME: "agent1"
+      JENKINS_SECRET: "TOKEN-AGENT-1"
+    depends_on:
+      - jenkins
+    restart: unless-stopped
+    networks:
+      - jenkins-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins_agent_1_home:/home/jenkins/agent
+
+  jenkins-agent-2:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: jenkins-agent-2
+    environment:
+      JENKINS_URL: http://jenkins:8080
+      JENKINS_AGENT_NAME: "agent2"
+      JENKINS_SECRET: "TOKEN-AGENT-2"
+    depends_on:
+      - jenkins
+    restart: unless-stopped
+    networks:
+      - jenkins-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins_agent_2_home:/home/jenkins/agent
+
 volumes:
-  jenkins_jenkins_home:
-    external: true
-#    driver: local
+  jenkins_home:
+    driver: local
+  jenkins_agent_1_home:
+    driver: local
+  jenkins_agent_2_home:
+    driver: local
+
+networks:
+  jenkins-network:
+    driver: bridge
