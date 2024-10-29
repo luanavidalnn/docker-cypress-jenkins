@@ -30,13 +30,16 @@ RUN curl -L https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMET
     rm /tmp/apache-jmeter.tgz
 
 RUN mkdir -p /var/jenkins_home/.ssh && \
+    chown -R jenkins:jenkins /var/jenkins_home/.ssh && \
+    chmod 700 /var/jenkins_home/.ssh && \
+    chmod 600 /var/jenkins_home/.ssh/id_rsa && \
+    touch /var/jenkins_home/.ssh/known_hosts && \
     ssh-keyscan -t rsa github.com >> /var/jenkins_home/.ssh/known_hosts && \
-    chown -R jenkins:jenkins /var/jenkins_home && \
-    chmod -R 775 /var/jenkins_home
+    chown jenkins:jenkins /var/jenkins_home/.ssh/known_hosts && \
+    chmod 644 /var/jenkins_home/.ssh/known_hosts
 
 RUN chown -R jenkins:jenkins /var/jenkins_home/workspace/*/.git || true
 
 USER jenkins
 
 ENTRYPOINT ["/usr/local/bin/jenkins.sh"]
-
