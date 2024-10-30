@@ -29,3 +29,12 @@
 - Execute o docker-compose.yml
 
   docker compose up -d
+
+## Terceiro passo:
+
+- Acessar o jenkins: Gerenciar Jenkins ---> Nodes
+- Em Nodes é necessário criar "Novo nó"
+- Em "Novo nó" definir o nome do nó e selecionar "Agente permanente" e "Criar"
+- Depois de "Criar" pode-se definir configurações que adequem-se a seu ambiente, bem como um label.
+- Após isso você poderá fazer um teste de conexão, onde será liberado uma secret. Essa secret precisa ser copiada e colada no docker-compose.yml no lugar do "TOKEN-AGENT-*"
+- Depois do docker-compose.yml salvo com as novas informações de secret, ele precisa ser iniciado para que a conexão dos nós se estabeleça.
