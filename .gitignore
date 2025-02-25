@@ -1,0 +1,17 @@
+# Ignorar arquivos de configuração sensíveis
+*.env
+
+# Ignorar diretórios e arquivos do Jenkins
+jenkins_home/
+jenkins_ssh/
+
+# Ignorar logs e arquivos temporários do Docker
+docker-compose.override.yml
+docker-compose.debug.yml
+*.log
+*.tmp
+*.bak
+
+# Ignorar caches e dependências do sistema
+__pycache__/
+node_modules/

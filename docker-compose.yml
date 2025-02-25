@@ -11,6 +11,9 @@ services:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
       - ./jenkins_ssh:/var/jenkins_home/.ssh
+    environment:
+      - JENKINS_OPTS=--prefix=/jenkins
+      - JAVA_OPTS=-Dhudson.model.DirectoryBrowserSupport.CSP=""
     restart: unless-stopped
     networks:
       - jenkins-network
@@ -20,10 +23,11 @@ services:
       context: .
       dockerfile: Dockerfile.agent
     container_name: jenkins-agent-1
+    env_file:
+      - .agent1.env
     environment:
       JENKINS_URL: http://jenkins:8080
       JENKINS_AGENT_NAME: "agent1"
-      JENKINS_SECRET: "TOKEN-AGENT-1"
     depends_on:
       - jenkins
     restart: unless-stopped
@@ -38,10 +42,11 @@ services:
       context: .
       dockerfile: Dockerfile.agent
     container_name: jenkins-agent-2
+    env_file:
+      - .agent2.env
     environment:
       JENKINS_URL: http://jenkins:8080
       JENKINS_AGENT_NAME: "agent2"
-      JENKINS_SECRET: "TOKEN-AGENT-2"
     depends_on:
       - jenkins
     restart: unless-stopped
@@ -50,6 +55,27 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./jenkins_ssh:/home/jenkins/.ssh/
+
+  jmeter:
+    image: justb4/jmeter
+    container_name: jmeter
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    networks:
+      - test_network
+    restart: unless-stopped
+
+
+  cypress:
+    image: cypress/included:latest
+    container_name: cypress
+    volumes:
+      - ./cypress:/e2e
+    networks:
+      - test_network
+    restart: unless-stopped
 
 volumes:
   jenkins_home:
