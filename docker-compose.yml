@@ -18,6 +18,17 @@ services:
     networks:
       - jenkins-network
 
+  dind:
+    image: docker:dind
+    container_name: dind
+    privileged: true  
+    environment:
+      DOCKER_TLS_CERTDIR: ""  
+    networks:
+      - jenkins-network
+    volumes:
+      - dind-storage:/var/lib/docker 
+
   jenkins-agent-1:
     build:
       context: .
@@ -28,8 +39,10 @@ services:
     environment:
       JENKINS_URL: http://jenkins:8080
       JENKINS_AGENT_NAME: "agent1"
+      DOCKER_HOST: tcp://dind:2375  # Conecta ao serviço DinD
     depends_on:
       - jenkins
+      - dind
     restart: unless-stopped
     networks:
       - jenkins-network
@@ -47,8 +60,10 @@ services:
     environment:
       JENKINS_URL: http://jenkins:8080
       JENKINS_AGENT_NAME: "agent2"
+      DOCKER_HOST: tcp://dind:2375  # Conecta ao serviço DinD
     depends_on:
       - jenkins
+      - dind
     restart: unless-stopped
     networks:
       - jenkins-network
@@ -59,10 +74,6 @@ services:
   jmeter:
     image: justb4/jmeter
     container_name: jmeter
-    environment:
-      - DISPLAY=${DISPLAY}
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
     networks:
       - jenkins-network
     restart: unless-stopped
@@ -80,6 +91,7 @@ services:
 volumes:
   jenkins_home:
     driver: local
+  dind-storage:
 
 networks:
   jenkins-network:
