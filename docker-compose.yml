@@ -64,7 +64,7 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
     networks:
-      - test_network
+      - jenkins-network
     restart: unless-stopped
 
 
@@ -74,7 +74,7 @@ services:
     volumes:
       - ./cypress:/e2e
     networks:
-      - test_network
+      - jenkins-network
     restart: unless-stopped
 
 volumes:
