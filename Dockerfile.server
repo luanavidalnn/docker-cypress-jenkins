@@ -2,33 +2,6 @@ FROM jenkins/jenkins:latest
 
 USER root
 
-RUN apt-get update && apt-get install -y \
-  libgtk2.0-0 \
-  libgtk-3-0 \
-  libgbm-dev \
-  libnotify-dev \
-  libnss3 \
-  libxss1 \
-  libasound2 \
-  libxtst6 \
-  xauth \
-  xvfb \
-  libxrandr2 \
-  libglib2.0-0 \
-  libgbm1 \
-  libatk1.0-0 \
-  libatk-bridge2.0-0 \
-  libcups2 \
-  libdrm2 && \
-  rm -rf /var/lib/apt/lists/*
-
-ARG JMETER_VERSION=5.6.3
-
-RUN curl -L https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz -o /tmp/apache-jmeter.tgz && \
-    mkdir /opt/jmeter && \
-    tar -xzf /tmp/apache-jmeter.tgz -C /opt/jmeter --strip-components=1 && \
-    rm /tmp/apache-jmeter.tgz
-
 RUN mkdir -p /var/jenkins_home/.ssh && \
     chown -R jenkins:jenkins /var/jenkins_home/.ssh && \
     chmod 700 /var/jenkins_home/.ssh && \
