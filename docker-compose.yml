@@ -1,45 +1,31 @@
+version: '3.8'
+
 services:
   jenkins:
     build:
       context: .
       dockerfile: Dockerfile.server
+    image: jenkins-server:custom
     container_name: jenkins-server
     ports:
       - "8080:8080"
-      - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./jenkins_ssh:/var/jenkins_home/.ssh
+      - ./jenkins_ssh:/var/jenkins_home/.ssh:ro
     environment:
-      - JENKINS_OPTS=--prefix=/jenkins
       - JAVA_OPTS=-Dhudson.model.DirectoryBrowserSupport.CSP=""
     restart: unless-stopped
     networks:
       - jenkins-network
 
-  dind:
-    image: docker:dind
-    container_name: dind
-    privileged: true  
-    environment:
-      DOCKER_TLS_CERTDIR: ""  
-    networks:
-      - jenkins-network
-    volumes:
-      - dind-storage:/var/lib/docker 
-
   jenkins-agent-1:
-    build:
-      context: .
-      dockerfile: Dockerfile.agent
+    image: jenkins-agent:custom
     container_name: jenkins-agent-1
     env_file:
       - .agent1.env
     environment:
       JENKINS_URL: http://jenkins:8080
       JENKINS_AGENT_NAME: "agent1"
-      DOCKER_HOST: tcp://dind:2375  # Conecta ao serviço DinD
     depends_on:
       - jenkins
       - dind
@@ -47,20 +33,17 @@ services:
     networks:
       - jenkins-network
     volumes:
+      - ./jenkins_ssh:/home/jenkins/.ssh:ro
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./jenkins_ssh:/home/jenkins/.ssh/
 
   jenkins-agent-2:
-    build:
-      context: .
-      dockerfile: Dockerfile.agent
+    image: jenkins-agent:custom
     container_name: jenkins-agent-2
     env_file:
       - .agent2.env
     environment:
       JENKINS_URL: http://jenkins:8080
       JENKINS_AGENT_NAME: "agent2"
-      DOCKER_HOST: tcp://dind:2375  # Conecta ao serviço DinD
     depends_on:
       - jenkins
       - dind
@@ -68,29 +51,22 @@ services:
     networks:
       - jenkins-network
     volumes:
+      - ./jenkins_ssh:/home/jenkins/.ssh:ro
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./jenkins_ssh:/home/jenkins/.ssh/
 
-  jmeter:
-    image: justb4/jmeter
-    container_name: jmeter
+  dind:
+    image: docker:dind
+    container_name: docker-dind
+    privileged: true
     networks:
       - jenkins-network
-    restart: unless-stopped
-
-
-  cypress:
-    image: cypress/included:latest
-    container_name: cypress
     volumes:
-      - ./cypress:/e2e
-    networks:
-      - jenkins-network
-    restart: unless-stopped
+      - dind-storage:/var/lib/docker
+    environment:
+      DOCKER_TLS_CERTDIR: "" 
 
 volumes:
   jenkins_home:
-    driver: local
   dind-storage:
 
 networks:
