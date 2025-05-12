@@ -28,7 +28,6 @@ services:
       JENKINS_AGENT_NAME: "agent1"
     depends_on:
       - jenkins
-      - dind
     restart: unless-stopped
     networks:
       - jenkins-network
@@ -46,7 +45,6 @@ services:
       JENKINS_AGENT_NAME: "agent2"
     depends_on:
       - jenkins
-      - dind
     restart: unless-stopped
     networks:
       - jenkins-network
@@ -54,21 +52,9 @@ services:
       - ./jenkins_ssh:/home/jenkins/.ssh:ro
       - /var/run/docker.sock:/var/run/docker.sock
 
-  dind:
-    image: docker:dind
-    container_name: docker-dind
-    privileged: true
-    networks:
-      - jenkins-network
-    volumes:
-      - dind-storage:/var/lib/docker
-    environment:
-      DOCKER_TLS_CERTDIR: "" 
-
 volumes:
   jenkins_home:
-  dind-storage:
-
+  
 networks:
   jenkins-network:
     driver: bridge

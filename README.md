@@ -4,7 +4,7 @@
 
 - No diretorio do projeto crie uma pasta para armazenar a chave ssh do github
   
-  mkdir -p ./jenkins-ssh
+  mkdir -p ./jenkins_ssh
   
 - Gere a chave dentro desse novo diretorio criado
   

@@ -40,5 +40,3 @@ RUN mkdir -p /var/jenkins_home/.ssh && \
 RUN chown -R jenkins:jenkins /var/jenkins_home/workspace/*/.git || true
 
 USER jenkins
-
-ENTRYPOINT ["/usr/local/bin/jenkins.sh"]

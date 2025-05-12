@@ -3,8 +3,9 @@ FROM jenkins/inbound-agent
 
 USER root
 
-RUN apt-get update && apt-get install -y coreutils && dpkg --configure -a && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y coreutils curl gnupg lsb-release && dpkg --configure -a && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install -y docker.io
 
 RUN apt-get update && apt-get install -y \
   libgtk2.0-0 \
@@ -25,6 +26,10 @@ RUN apt-get update && apt-get install -y \
   libcups2 \
   libdrm2 && \
   rm -rf /var/lib/apt/lists/*
+
+ARG DOCKER_GID=988
+
+RUN usermod -aG docker jenkins
 
 ARG JMETER_VERSION=5.6.3
 
